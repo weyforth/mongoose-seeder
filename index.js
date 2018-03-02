@@ -21,7 +21,8 @@ module.exports = (function() {
     // The default options
     var DEFAULT_OPTIONS = {
         dropDatabase: true,
-        dropCollections: false
+        dropCollections: false,
+        mongoose: mongoose
     };
 
     var _this = {
@@ -72,13 +73,13 @@ module.exports = (function() {
                     delete value._model;
 
                     // retrieve the model depending on the name provided
-                    var Model = mongoose.model(modelName);
+                    var Model = _this.options.mongoose.model(modelName);
 
                     async.series([
                         function(callback) {
                             if(_this.options.dropCollections === true) {
                                 // Drop the collection
-                                mongoose.connection.db.dropCollection(Model.collection.name, function(err) {
+                                _this.options.mongoose.connection.db.dropCollection(Model.collection.name, function(err) {
                                     callback();
                                 });
                             }
@@ -252,7 +253,7 @@ module.exports = (function() {
 
             if(_this.options.dropDatabase === true) {
                 // Make sure to drop the database first
-                mongoose.connection.db.dropDatabase(function(err) {
+                _this.options.mongoose.connection.db.dropDatabase(function(err) {
                     if(err) {
                         // Stop seeding if an error occurred
                         return done(err);
